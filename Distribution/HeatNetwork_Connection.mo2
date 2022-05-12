@@ -1,0 +1,967 @@
+﻿// CP: 65001
+// SimulationX Version: 4.2.3.69223
+within CoSES_Models.Distribution;
+model HeatNetwork_Connection "HeatNetwork_Connection"
+	GreenCity.Interfaces.Thermal.ExtractVolumeFlow toSFx_Thigh annotation(Placement(transformation(
+		origin={165,-15},
+		extent={{10,-10},{-10,10}},
+		rotation=180)));
+	GreenCity.Interfaces.Thermal.DefineVolumeFlow fromSFy_Thigh annotation(Placement(transformation(extent={{175,40},{155,20}})));
+	GreenCity.Interfaces.Thermal.DefineVolumeFlow fromSFx_Thigh annotation(Placement(transformation(extent={{175,75},{155,55}})));
+	GreenCity.Utilities.Thermal.MergingValve mergingValve1 annotation(Placement(transformation(extent={{100,40},{120,60}})));
+	GreenCity.Utilities.Thermal.DistributionValve distributionValve1 annotation(Placement(transformation(extent={{85,30},{65,10}})));
+	GreenCity.Utilities.Thermal.DistributionValve distributionValve2 annotation(Placement(transformation(extent={{100,-40},{120,-20}})));
+	Modelica.Blocks.Sources.RealExpression qv_toSubstation_TH(y=0) "Set output signal to a time varying Real expression" annotation(Placement(transformation(extent={{10,-15},{30,5}})));
+	GreenCity.Interfaces.Thermal.ExtractVolumeFlow toSFy_Thigh annotation(Placement(transformation(
+		origin={165,-45},
+		extent={{10,-10},{-10,10}},
+		rotation=180)));
+	Modelica.Blocks.Sources.RealExpression realExpression1 annotation(Placement(transformation(extent={{-35,40},{-15,60}})));
+	equation
+		connect(distributionValve2.PipeIn,distributionValve1.PipeOutRegulated) annotation(Line(
+			points={{100,-30},{95,-30},{60,-30},{60,15},{65,15}},
+			color={190,30,45},
+			thickness=0.015625));
+		connect(distributionValve1.PipeIn,mergingValve1.PipeOut) annotation(Line(
+			points={{85,20},{90,20},{95,20},{95,50},{100,50}},
+			color={190,30,45},
+			thickness=0.015625));
+		connect(qv_toSubstation_TH.y,distributionValve1.qvRef) annotation(Line(
+			points={{31,-5},{36,-5},{75,-5},{75,5},{75,10}},
+			color={0,0,127},
+			thickness=0.0625));
+		connect(mergingValve1.PipeIn1,fromSFx_Thigh.Pipe) annotation(Line(
+			points={{120,55},{125,55},{150,55},{150,65},{155,65}},
+			color={190,30,45},
+			thickness=0.015625));
+		connect(mergingValve1.PipeIn2,fromSFy_Thigh.Pipe) annotation(Line(
+			points={{120,45},{125,45},{150,45},{150,30},{155,30}},
+			color={190,30,45},
+			thickness=0.015625));
+		connect(distributionValve2.PipeOutRegulated,toSFx_Thigh.Pipe) annotation(Line(
+			points={{120,-25},{125,-25},{150,-25},{150,-15},{155,-15}},
+			color={190,30,45}));
+		connect(distributionValve2.PipeOutRemain,toSFy_Thigh.Pipe) annotation(Line(
+			points={{120,-35},{125,-35},{150,-35},{150,-45},{155,-45}},
+			color={190,30,45}));
+	annotation(
+		__esi_viewinfo[0](
+			fMin=1,
+			fMax=100,
+			nf=100,
+			kindSweep=1,
+			expDataFormat=0,
+			expNumberFormat="%.7lg",
+			expMatrixNames={
+							"A","B","C","D","E"},
+			typename="AnaLinSysInfo"),
+		__esi_viewinfo[1](
+			showAll=false,
+			hideInfinity=true,
+			fMin=0,
+			fMax=1000000,
+			TMin=0,
+			TMax=1000000,
+			animGain=-10,
+			animFreq=0,
+			formatAbsDev="%.4lf",
+			formatArgDev="%.2lf",
+			formatEnergy="%.4lf",
+			minNormDev=0.0001,
+			minNormEnergy=1e-06,
+			minAbsEnergy=1e-12,
+			scaleEnergy=0.01,
+			typename="AnaEFEWInfo"),
+		Documentation(info="<HTML><HEAD>
+<META http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\"> 
+<TITLE>Software in the Loop Model of SF2</TITLE> 
+<STYLE type=\"text/css\">
+table>tbody>tr:hover,th{background-color:#edf1f3}html{font-size:90%}body,table{font-size:1rem}body{font-family:'Open Sans',Arial,sans-serif;color:#465e70}h1,h2{margin:1em 0 .6em;font-weight:600}p{margin-top:.3em;margin-bottom:.2em}table{border-collapse:collapse;margin:1em 0;width:100%;}tr{border:1px solid #beccd3}td,th{padding:.3em 1em; border-width: 1px; border-style: solid; border-color: rgb(190, 204, 211);}td{word-break:break-word}tr:nth-child(even){background-color:#fafafa}th{font-family:'Open Sans Semibold',Arial,sans-serif;font-weight:700;text-align:left;word-break:keep-all}.lib-wrap{width:70%}@media screen and (max-width:800px){.lib-wrap{width:100%}}td p{margin:.2em}
+</STYLE>
+  
+<META name=\"GENERATOR\" content=\"MSHTML 11.00.10570.1001\"></HEAD> 
+<BODY>
+<H1>Software in the Loop Model of SF2</H1>
+<HR>
+
+<P>Software in the Loop model of SF2 for VeriStand. This model can be used to   
+test a controller before doing experiments in the laboratory. The model can be  
+generated for using Typedays (similar to HiL models) or for  running it  
+continuously.</P>
+<P>The model  consists  of the same components as SF2:</P>
+<UL>
+  <LI>Air Source Heat Pump (ASHP): Wolf CHA10<BR>nominal heating power / COP     
+          (A2/W35):   5.75 kW_th&nbsp;/ 4.65<BR>electric auxiliary heater: 6     
+          kW<BR>nominal cooling   power / EER (A35/W18): 6.01 kW_th / 5.92</LI>
+  <LI>Condensing Boiler: Wolf CGB20, nominal thermal power: 20 kW_th</LI>
+  <LI>Solar Thermal emulator of variable size, up to 9 kW_th</LI>
+  <LI>PV system of variable size</LI>
+  <LI>Thermal Storage: Wolf&nbsp;BSP 800,&nbsp;content: 785 l&nbsp;</LI>
+  <LI>Domestic Hot Water (DHW) preparation: Fresh water station            
+  (simplified)</LI>
+  <LI>Consumption - House parameters:<BR>Construction year: 2007 to 2009 (EnEv   
+              2007)<BR>Additional insulation: roof + walls + floor<BR>Number of  
+       floors:         2<BR>Number       of apartements: 2<BR>Number of 
+  inhabitants:         10<BR>Living       area: 500m²<BR>Heating     
+  system:&nbsp;floor         heating&nbsp;(supply / return       
+  temperatur:&nbsp;40        /&nbsp;30&nbsp;°C)</LI></UL>
+<P>Four boolean inputs can activate a predefined standard control for simple     
+ simulation results or during a lead time of the simulation. The standard      
+control  of each element is as follows:</P>
+<UL>
+  <LI>ASHP:<BR>Switched on at 100 % modulation,               
+  when:<BR>&nbsp;&nbsp;&nbsp;&nbsp;     T_Storage,top             
+  &lt;&nbsp;T_Start,HP,high&nbsp;or T_Storage,middle &lt;             
+  T_Start,HP,low<BR>Switched   off,     when:<BR>&nbsp;&nbsp;&nbsp;&nbsp;        
+       T_Storage,top &gt; T_Stop,HP,high and T_Storage,middle&nbsp;&gt;          
+     T_Stop,HP,low<BR><BR></LI>
+  <LI>Auxiliary Heater (standard control is active, when ASHP standard control   
+            is active):<BR>Switch on at 100%, when:<BR>&nbsp;&nbsp;&nbsp;&nbsp;  
+   ASHP   =     on     and (T_Storage,top &lt;&nbsp;T_Start,Aux,high&nbsp;or     
+    T_Storage,middle   &lt;     T_Start,Aux,low)<BR>Switch off,       
+  when:<BR>&nbsp;&nbsp;&nbsp;&nbsp;   ASHP =     off&nbsp;or       
+  (T_Storage,top&nbsp;&gt;&nbsp;T_Stop,Aux,high&nbsp;and             
+  T_Storage,middle&nbsp;&gt; T_Stop,Aux,low)<BR><BR></LI>
+  <LI>ASHP 3way valve:<BR>Domestic hot water should be produced at a higher      
+         priority<BR>Switch to the top ports (DHW), when:<BR>&nbsp;&nbsp;&nbsp;  
+             T_Storage,top &lt;&nbsp;T_Start,HP,high<BR>Switch to the middle 
+  ports             (heating), when:<BR>&nbsp;&nbsp;&nbsp;             
+  T_Storage,top&nbsp;&gt;&nbsp;T_Stop,HP,high<BR><BR></LI>
+  <LI>Condensing Boiler:<BR>The condensing boiler should only operate, if the    
+             ASHP cannot provide the required heat.<BR>Switched on at 100 %      
+   modulation,             when:<BR>&nbsp;&nbsp;&nbsp;&nbsp; T_Storage,top &lt;  
+       T_Start,CB and             SOC_Storage &lt; SOCminCB<BR>Switched off,     
+      when:<BR>&nbsp;&nbsp;&nbsp;&nbsp;           T_Storage,bottom &gt; 
+  T_Stop,CB or         SOC_Storage &gt;   SOCmaxCB<BR><BR></LI>
+  <LI>Solar Thermal pump:<BR>The control is&nbsp;based on Green City's           
+        'SolarController'<BR>Solar thermal pump switched on,                 
+  when:<BR>&nbsp;&nbsp;&nbsp;&nbsp; (T_Collector - T_Storage,in) &gt;            
+       deltaTonST<BR>Solar thermal pump switched off,                 
+  when:<BR>&nbsp;&nbsp;&nbsp;&nbsp; (T_Collector - T_Storage,in)&nbsp;&lt;       
+            deltaToffST<BR>The pump is controlled with the following             
+      conditions:<BR>&nbsp;&nbsp;&nbsp;&nbsp; if (T_Flow - T_Return) &lt;        
+           deltaTFlowReturnLow, the reference volume flow is at  minimum         
+          level.<BR>&nbsp;&nbsp;&nbsp;&nbsp; if (T_Flow - T_Return) &gt;         
+          deltaTFlowReturnMax, the reference volume flow is at  maximum          
+         level.<BR>&nbsp;&nbsp;&nbsp;&nbsp; Between the two temperature  
+  boundaries the                 reference volume flow is linearly  
+  interpolated.</LI></UL>
+<DIV class=\"lib-wrap\">
+<TABLE class=\"type\">
+  <TBODY>
+  <TR>
+    <TH>Symbol:</TH>
+    <TD colspan=\"3\"><IMG width=\"267\" height=\"244\" src=\"data:image/png;base64,
+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\"></TD></TR>
+  <TR>
+    <TH>Identifier:</TH>
+    <TD colspan=\"3\">CoSES_Models.CodeExport.VeriStandSiL.SimX_SF2_SiL</TD></TR>
+  <TR>
+    <TH>Version:</TH>
+    <TD colspan=\"3\">1.0</TD></TR>
+  <TR>
+    <TH>File:</TH>
+    <TD colspan=\"3\">SimX_SF2_SiL.mo</TD></TR>
+  <TR>
+    <TH>Connectors:</TH>
+    <TD>EB_EBon_off</TD>
+    <TD>EB_EBon_off</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>ASHP_ASHP_mode</TD>
+    <TD>ASHP_ASHP_mode</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>ASHP_Modulation_set</TD>
+    <TD>ASHP_Modulation_set</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>EB_EB_power_kW</TD>
+    <TD>EB_EB_power_kW_set</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>ST_S_FW_ST</TD>
+    <TD>ST_S_FW_ST_VL_set</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>CHN_S_FW_HC_set</TD>
+    <TD>CHN_S_FW_HC_set</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>CHN_S_FW_TG_set</TD>
+    <TD>CHN_S_FW_TG_set</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>CHN_S_TM_TG_TH</TD>
+    <TD>CHN_S_TM_TG_TH</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>WatchDogCount</TD>
+    <TD>WatchDogCount</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>ASHP_A_V3_TL</TD>
+    <TD>ASHP_A_V3_TL</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>Parameters:</TH>
+    <TD>Specifies a Thermal Volume Flow Connector</TD>
+    <TD>defineVolumeFlow1</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Extracts the characteristics of a Thermal Volume Flow Connector</TD>
+    <TD>extractVolumeFlow1</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Specifies a Thermal Volume Flow Connector</TD>
+    <TD>defineVolumeFlow2</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Extracts the characteristics of a Thermal Volume Flow Connector</TD>
+    <TD>extractVolumeFlow2</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Set output signal to a time varying Real expression</TD>
+    <TD>qvDHgrid</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Electrical power grid for connection of maximum six 3-phase AC       
+      components</TD>
+    <TD>grid1</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Signal Input with Derivatives</TD>
+    <TD>sigInDer2</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Signal Input to Real Output</TD>
+    <TD>i2RO2</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Real Input to Signal Output</TD>
+    <TD>rI2O2</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>var_HPMode</TD>
+    <TD>var_HPMode</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>var_SwitchHPTSPort</TD>
+    <TD>var_SwitchHPTSPort</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>File of all parameters of SF2 (weather, presence, Pel, DHW)</TD>
+    <TD>File</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>If true, Typedays are used</TD>
+    <TD>UseTypedays</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>1 - WSC, 2 - WSS, 3 - WWS, 4 - WWC, 5 - TWC, 6 - SSS, 7 - TWS, 8 -     
+        TSS, 9 - SWC, 10 - SSC, 11 - TSC, 12 - SWS, 13 - coldest</TD>
+    <TD>SF2_TypeDay</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Additional time before the experiment in order to reach initial       
+      conditions for the experiment</TD>
+    <TD>SF2_InitializationTime_h</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Initial time of the day</TD>
+    <TD>InitTime</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>InitialDay</TD>
+    <TD>InitDay</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Initial Month</TD>
+    <TD>InitMonth</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Initial Temperature</TD>
+    <TD>TLiving_Init</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Initial Temperature</TD>
+    <TD>TRoof_Init</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Initial Temperature</TD>
+    <TD>TCellar_Init</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>T_roomSet_degC</TD>
+    <TD>SF2_T_roomSet_degC</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>T_roomNightSet_degC</TD>
+    <TD>SF2_T_roomNightSet_degC</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>NightTimeReductionStart_h</TD>
+    <TD>SF2_NightTimeReductionStart_h</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>NightTimeReductionEnd_h</TD>
+    <TD>SF2_NightTimeReductionEnd_h</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>0 - Radiator Heating, 1 - Space Heating</TD>
+    <TD>SF2_HeatingSystem</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>nPeople</TD>
+    <TD>SF2_nPeople</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>nFloors</TD>
+    <TD>SF2_nFloors</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>nApartments</TD>
+    <TD>SF2_nApartments</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>HeatedArea_m2</TD>
+    <TD>SF2_HeatedArea_m2</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>YearlyElecConsumption_kWh</TD>
+    <TD>SF2_YearlyElecConsumption_kWh</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>V_DHWperDay_l</TD>
+    <TD>SF2_V_DHWperDay_l</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>DHWFactor</TD>
+    <TD>DHWFactor</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>0 - Flat Plate Collector, 1 - Compound Parabolic Collector</TD>
+    <TD>SF2_ST_CollectorType</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>ST_CollectorSurface_m2</TD>
+    <TD>SF2_ST_CollectorSurface_m2</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>ST_CollectorVolume_m3</TD>
+    <TD>SF2_ST_CollectorVolume_m3</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>PV_PeakPower_kW</TD>
+    <TD>SF2_PV_PeakPower_kW</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>initial temperature of lowest storage layer</TD>
+    <TD>SF2_TS_S_TM_BT_1_init</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>initial temperature of highest storage layer</TD>
+    <TD>SF2_TS_S_TM_BT_10_init</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Reference temperature of BT to calculate SOC, T_Sto = T_ref =&gt; SOC  
+           = 0</TD>
+    <TD>SF2_T_reference_BT</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Maximum temperature of storage, T_sto = T_max =&gt; SOC = 1</TD>
+    <TD>SF2_T_max_BT</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Standard control for switching between upper and lower port (input for 
+            ASHP_A_V3_TL is ignored if true)</TD>
+    <TD>SF2_HPSwitchStandardControl</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Standard control for solar thermal pump (input for ST_S_FW_ST_set is   
+          ignored if true)</TD>
+    <TD>SF2_STStandardControl</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Standard control for the HP (input for ASHP_ASHP_mode and       
+      ASHP_Modulation_set are ignored if true)</TD>
+    <TD>SF2_HPStandardControl</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Standard control for the condensing boiler (input for EB_EBon_off and  
+           EB_EB_power_kW_set are ignored if true)</TD>
+    <TD>SF2_CBStandardControl</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Set output signal to a time varying Real expression</TD>
+    <TD>modeltime_s</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Set output signal to a time varying Real expression</TD>
+    <TD>qvDHpump</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Set output signal to a time varying Real expression</TD>
+    <TD>HPAuxModulation</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Set output signal to a time varying Real expression</TD>
+    <TD>qvSTpump</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Set output signal to a time varying Real expression</TD>
+    <TD>HPModulation</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Set output signal to a time varying Real expression</TD>
+    <TD>CBIn_P</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Set output signal to a time varying Real expression</TD>
+    <TD>TDHgrid_in</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>NTU heat exchanger</TD>
+    <TD>heatExchanger1</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Environment with user defined weather profiles</TD>
+    <TD>environment1</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Standard control for switching between upper and lower port (input for 
+            ASHP_A_V3_TL is ignored if true)</TD>
+    <TD>StandardHPSwitchControl</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Standard control for solar thermal pump (input for ST_S_FW_ST_set is   
+          ignored if true)</TD>
+    <TD>StandardSTControl</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Standard control for the HP (input for ASHP_ASHP_mode and       
+      ASHP_Modulation_set are ignored if true)</TD>
+    <TD>StandardHPControl</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Standard control for the condensing boiler (input for EB_EBon_off and  
+           EB_EB_power_kW_set are ignored if true)</TD>
+    <TD>StandardCBControl</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>House 2 with ST, CB and ASHP</TD>
+    <TD>SF2</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Standard control for DHW pump (input for TS_S_FW_HC_HW_set is ignored  
+           if true)</TD>
+    <TD>HPMode</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Set output signal to a time varying Boolean expression</TD>
+    <TD>SwitchHPTSPort</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>Results:</TH>
+    <TD>var_qvDHpump</TD>
+    <TD>var_qvDHpump</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>var_qvDHWpump</TD>
+    <TD>var_qvDHWpump</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>var_qvSTpump</TD>
+    <TD>var_qvSTpump</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>var_CBIn_P</TD>
+    <TD>var_CBIn_P</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>var_qvDHgrid</TD>
+    <TD>var_qvDHgrid</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>var_TDHgrid_in</TD>
+    <TD>var_TDHgrid_in</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>var_HPModulation</TD>
+    <TD>var_HPModulation</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>var_HPAuxModulation</TD>
+    <TD>var_HPAuxModulation</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Condensing boiler flow temperature</TD>
+    <TD>CB_S_TM_VL</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Condensing boiler return temperature</TD>
+    <TD>CB_S_TM_RL</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Volume flow condensing boiler</TD>
+    <TD>CB_S_FW_HC</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Gas flow condensing boiler</TD>
+    <TD>CB_S_FG</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Demanded fuel volume</TD>
+    <TD>CB_VFuel</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Heat output power of condensing boiler</TD>
+    <TD>CB_P_heat_is</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Gas power of condensing boiler</TD>
+    <TD>CB_P_gas_is</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Heat output of condensing boiler</TD>
+    <TD>CB_E_heat_produced</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Gas input of condensing boiler</TD>
+    <TD>CB_E_gas_consumed</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Heating efficiency</TD>
+    <TD>CB_Efficiency</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Heat pump flow temperature (output of the outdoor unit)</TD>
+    <TD>HP_S_TM_VL</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Heat pump return temperature</TD>
+    <TD>HP_S_TM_RL</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Heat pump flow temperature - Low temperature</TD>
+    <TD>HP_S_TM_HC_TL</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Heat pump flow temperature - High temperature</TD>
+    <TD>HP_S_TM_HW_TH</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Volume flow heat pump</TD>
+    <TD>HP_S_FW_HC</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Heat output power of the heat pump </TD>
+    <TD>HP_P_heat_HP</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Heat output power of the auxiliary heater</TD>
+    <TD>HP_P_heat_Aux</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Total heat output power of the heat pump</TD>
+    <TD>HP_P_heat_Tot</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Cooling output of the heat pump</TD>
+    <TD>HP_P_cooling</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Total electricity demand of heat pump</TD>
+    <TD>HP_P_elec_is</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Heat output of the heat pump </TD>
+    <TD>HP_E_heat_HP</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Heat output power of the auxiliary heater</TD>
+    <TD>HP_E_heat_Aux</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Total heat output power of the heat pump</TD>
+    <TD>HP_E_heat_Tot</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Cooling output of the heat pump</TD>
+    <TD>HP_E_cooling</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Consumed electric energy of heat pump</TD>
+    <TD>HP_E_elec_consumed</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Coefficiency of performance</TD>
+    <TD>HP_COP</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Energy Efficiency Ratio (Cooling)</TD>
+    <TD>HP_EER</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Solar thermal flow temperature</TD>
+    <TD>ST_S_TM_VL</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Solar thermal return temperature</TD>
+    <TD>ST_S_TM_RL</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>ST_S_TM_Collector</TD>
+    <TD>ST_S_TM_Collector</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Volume flow solar thermal</TD>
+    <TD>ST_S_FW_HC</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Heat output power of solar thermal</TD>
+    <TD>ST_P_heat_is</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Heat output of solar thermal</TD>
+    <TD>ST_E_heat_produced</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Power transfered to DHW storage</TD>
+    <TD>TS_P_heat_toHWS</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Flow temperature consumption side</TD>
+    <TD>TS_S_TM_HC_VL</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Return temperature consumption side</TD>
+    <TD>TS_S_TM_HC_RL</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Flow temperature producer side</TD>
+    <TD>TS_S_TM_PS_VL</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Return temperature producer side</TD>
+    <TD>TS_S_TM_PS_RL</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Flow temperature to DHW storage</TD>
+    <TD>TS_S_TM_HC_HW_VL</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Return temperature to DHW storage</TD>
+    <TD>TS_S_TM_HC_HW_RL</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>DHW storage temperature 1</TD>
+    <TD>TS_S_TM_HWS_1</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>DHW storage temperature 2</TD>
+    <TD>TS_S_TM_HWS_2</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>DHW storage temperature 3</TD>
+    <TD>TS_S_TM_HWS_3</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Thermal storage temperature 1</TD>
+    <TD>TS_S_TM_BT_1</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Thermal storage temperature 2</TD>
+    <TD>TS_S_TM_BT_2</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Thermal storage temperature 3</TD>
+    <TD>TS_S_TM_BT_3</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Thermal storage temperature 4</TD>
+    <TD>TS_S_TM_BT_4</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Thermal storage temperature 5</TD>
+    <TD>TS_S_TM_BT_5</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Thermal storage temperature 6</TD>
+    <TD>TS_S_TM_BT_6</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Thermal storage temperature 7</TD>
+    <TD>TS_S_TM_BT_7</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Thermal storage temperature 8</TD>
+    <TD>TS_S_TM_BT_8</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Thermal storage temperature 9</TD>
+    <TD>TS_S_TM_BT_9</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Thermal storage temperature 10</TD>
+    <TD>TS_S_TM_BT_10</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Volume flow to DHW storage</TD>
+    <TD>TS_S_FW_HC_HW</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Energy in thermal storage</TD>
+    <TD>TS_E_Storage_BT</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Energy in DHW storage</TD>
+    <TD>TS_E_Storage_HWS</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Total energy transfered to DHW storage</TD>
+    <TD>TS_E_heat_toHWS</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>State of charge of the thermal storage</TD>
+    <TD>TS_SOC_BT</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>State of charge of the DHW storage</TD>
+    <TD>TS_SOC_HWS</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Modeltime_s</TD>
+    <TD>Modeltime_s</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Heat Sink flow temperature before mixing unit</TD>
+    <TD>HS_S_TM_VL_bM</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Heat Sink flow temperature after mixing unit</TD>
+    <TD>HS_S_TM_VL_aM</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Heat sink return temperature</TD>
+    <TD>HS_S_TM_RL</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Heat sink flow temperature hot water</TD>
+    <TD>HS_S_TM_HW_VL</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Heat sink return temperature hot water</TD>
+    <TD>HS_S_TM_HW_RL</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>S_TM_ambient</TD>
+    <TD>S_TM_ambient</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>S_TM_roof</TD>
+    <TD>S_TM_roof</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>S_TM_room</TD>
+    <TD>S_TM_room</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>S_TM_cellar</TD>
+    <TD>S_TM_cellar</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Volume flow after mixing unit</TD>
+    <TD>HS_S_FW_HC_aM</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Volume flow before mixing unit</TD>
+    <TD>HS_S_FW_HC_bM</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Volume flow domestic hot water consumption</TD>
+    <TD>HS_S_FW_HW_VL</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Heating power</TD>
+    <TD>HS_P_DemHeatHC_is</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Domestic hot water power</TD>
+    <TD>HS_P_DemHeatHW_is</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Heating Energy</TD>
+    <TD>HS_E_DemHeatHC_consumed</TD>
+    <TD>&nbsp;</TD></TR>
+  <TR>
+    <TH>&nbsp;</TH>
+    <TD>Domestic hot water energy</TD>
+    <TD>HS_E_DemHeatHW_consumed</TD>
+    <TD>&nbsp;</TD></TR></TBODY></TABLE></DIV>
+<H2>Description:</H2>
+<P>&nbsp;</P></BODY></HTML>
+"),
+		experiment(
+			StopTime=1,
+			StartTime=0,
+			Tolerance=1e-06,
+			Interval=0.001,
+			__esi_SolverOptions(
+				solver="CVODE",
+				typename="ExternalCVODEOptionData"),
+			__esi_AbsTolerance="1e-6"));
+end HeatNetwork_Connection;

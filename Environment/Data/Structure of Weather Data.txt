@@ -1,0 +1,22 @@
+The rows/columns of the table should be filled as follows:
+
+double Init (1,6)
+1	2	3	4	5	6
+	1 - 0
+	2 - 'Initialization time': Hour, at which the simulation starts
+	3 - 'Initialization week day': Day of the week, at which the simulation starts (1: Mo, 2: Tue, 3: We, 4: Thu, 5: Fri, 6: Sa, 7: So)
+	4 - 'Initialization month day': Day within the month, at which the simulation starts
+	5 - 'Initialization Month': Month, at which the simulation starts
+	6 - 'Initalization Year': Year, at which the simulation starts
+
+
+double Weather('number of rows', 8)
+1	2	3	4	5	6	7	8
+	1 - time [s]
+	2 - Ambient temperature [°C]
+	3 - 7 day average temperature [°C]
+	4 - Solar direct radiation in radiation direction [W/m²]
+	5 - Solar diffuse radiation [W/m²]
+	6 - Wind speed [m/s]
+	7 - Wind direction [°] (use constant value if not known)
+	8 - Relative humidity [%] (use constant value, e.g. 80% if not known)

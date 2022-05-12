@@ -1,0 +1,6 @@
+#1
+double Init(1,6)
+0	0	5	1	1	2020
+
+double Weather(1,8)
+0	0	0	0	0	0	0	0

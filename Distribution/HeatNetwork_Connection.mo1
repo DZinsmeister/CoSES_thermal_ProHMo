@@ -1,0 +1,5 @@
+﻿// CP: 65001
+// SimulationX Version: 4.2.3.69223
+within CoSES_Models.Distribution;
+model HeatNetwork_Connection "HeatNetwork_Connection"
+end HeatNetwork_Connection;
